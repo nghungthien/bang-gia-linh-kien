@@ -116,14 +116,17 @@
     }
 
     /* Header cột: đỏ đậm, căn giữa */
-    table#banggia.dataTable thead > tr > th {
-      text-align: center !important;
-      vertical-align: middle !important;
-      color: #e74c3c !important;
-      font-weight: 800 !important;
-      border-bottom-width: 2px;
-      background-color: #ffffff !important;
-    }
+    /* Tiêu đề cột: đỏ đậm & căn giữa */
+#banggia thead th,
+#banggia thead th.sorting,
+#banggia thead th.sorting_asc,
+#banggia thead th.sorting_desc {
+    text-align: center !important;
+    vertical-align: middle !important;
+    color: #e74c3c !important;
+    font-weight: 800 !important;
+}
+
 
     /* SẢN PHẨM – căn trái */
     td.sanpham {
@@ -354,3 +357,4 @@
 
 </body>
 </html>
+
