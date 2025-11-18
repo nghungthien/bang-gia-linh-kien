@@ -122,18 +122,25 @@
       color: #e74c3c !important;
       font-weight: 800 !important;
       border-bottom-width: 2px;
+      background-color: #ffffff !important;
     }
 
-    /* Căn phải giá tiền */
+    /* SẢN PHẨM – căn trái */
+    td.sanpham {
+      text-align: left !important;
+    }
+
+    /* GIÁ BÁN – căn phải */
     td.gia {
-      text-align: right;
-      padding-right: 15px;
+      text-align: right !important;
+      padding-right: 15px !important;
       white-space: nowrap;
+      font-weight: 500;
     }
 
-    /* Căn giữa VAT & Bảo hành */
+    /* VAT & BẢO HÀNH – căn giữa */
     td.center {
-      text-align: center;
+      text-align: center !important;
       white-space: nowrap;
     }
 
@@ -146,7 +153,7 @@
       background-color: #f0f4ff;
     }
 
-    /* Dòng tổng số sản phẩm – căn trái, nằm trong card */
+    /* Dòng tổng số sản phẩm – căn trái trong card */
     #totalRow {
       margin-top: 8px;
       font-weight: 700;
@@ -309,24 +316,25 @@
           const tr = document.createElement("tr");
           tr.setAttribute("data-category", category);
 
-          // SẢN PHẨM
+          // SẢN PHẨM – căn trái
           let td = document.createElement("td");
+          td.classList.add("sanpham");
           td.textContent = name;
           tr.appendChild(td);
 
-          // GIÁ BÁN
+          // GIÁ BÁN – căn phải
           td = document.createElement("td");
           td.classList.add("gia");
           td.textContent = price;
           tr.appendChild(td);
 
-          // VAT
+          // VAT – căn giữa
           td = document.createElement("td");
           td.classList.add("center");
           td.textContent = vat;
           tr.appendChild(td);
 
-          // BẢO HÀNH
+          // BẢO HÀNH – căn giữa
           td = document.createElement("td");
           td.classList.add("center");
           td.textContent = warranty;
