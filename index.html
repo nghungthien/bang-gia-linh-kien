@@ -32,10 +32,12 @@
       font-weight: 600;
     }
 
-    /* Căn giữa tiêu đề */
-    table.dataTable thead th {
+    /* Tiêu đề cột đỏ đậm, căn giữa */
+    #banggia thead th {
       text-align: center !important;
       vertical-align: middle !important;
+      color: #e74c3c;
+      font-weight: 700;
     }
 
     /* Căn phải giá tiền */
@@ -189,18 +191,13 @@
       }
 
       table = $("#banggia").DataTable({
-        dom: 'rt<"bottom"lip><"clear">',
-        pageLength: 100,
+        dom: 'rt',            // chỉ table + header, không phân trang, không info
+        pageLength: -1,       // không dùng paging
+        paging: false,        // tắt phân trang
+        scrollY: '60vh',      // chiều cao, có thanh trượt dọc
+        scrollCollapse: true,
         language: {
-          lengthMenu: "Hiển thị _MENU_ dòng",
-          info: "Hiển thị _START_ đến _END_ trên tổng _TOTAL_ dòng",
-          emptyTable: "Không có dữ liệu",
-          paginate: {
-            first: "Đầu",
-            last: "Cuối",
-            next: "Sau",
-            previous: "Trước"
-          }
+          emptyTable: "Không có dữ liệu"
         }
       });
 
