@@ -115,13 +115,13 @@
       font-size: 14px;
     }
 
-    /* Header: base style (JS sẽ ép lại lần nữa sau) */
-    #banggia thead th {
-      text-align: center;
-      vertical-align: middle;
-      font-weight: 800;
-      color: #e74c3c;
-      background-color: #fff;
+    /* ===== HEADER – đỏ đậm & căn giữa, áp dụng cả header clone của DataTables ===== */
+    table.dataTable thead > tr > th {
+      text-align: center !important;
+      vertical-align: middle !important;
+      color: #e74c3c !important;
+      font-weight: 800 !important;
+      background-color: #ffffff !important;
     }
 
     /* SẢN PHẨM – căn trái */
@@ -268,14 +268,6 @@
         language: {
           emptyTable: "Không có dữ liệu"
         }
-      });
-
-      // 🔴 ÉP LẠI HEADER SAU KHI DATATABLES KHỞI TẠO
-      $('#banggia thead th').css({
-        'text-align': 'center',
-        'vertical-align': 'middle',
-        'color': '#e74c3c',
-        'font-weight': '800'
       });
 
       // Search custom
