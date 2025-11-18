@@ -32,7 +32,7 @@
       font-weight: 600;
     }
 
-    /* Căn giữa toàn bộ tiêu đề bảng */
+    /* Căn giữa tiêu đề */
     table.dataTable thead th {
       text-align: center !important;
       vertical-align: middle !important;
@@ -49,24 +49,22 @@
       text-align: center;
     }
 
-    /* Ẩn cột LOẠI (header + data) */
+    /* Ẩn cột LOẠI (chỉ cột 1) */
     #banggia th:nth-child(1),
     #banggia td:nth-child(1) {
       display: none;
     }
 
-    /* KHỐI CONTROL (lọc + search) */
     .controls {
       width: 900px;
       max-width: 100%;
-      margin: 0 auto 15px; /* Căn giữa dưới tiêu đề */
+      margin: 0 auto 15px;
     }
 
-    /* Hàng lọc loại */
     .filter-row {
       display: flex;
       align-items: center;
-      justify-content: center;  /* Căn giữa toàn bộ */
+      justify-content: center;
       margin-bottom: 10px;
     }
 
@@ -81,7 +79,6 @@
       height: 38px;
     }
 
-    /* Ô search custom */
     .search-row {
       border: 2px solid #e74c3c;
       border-radius: 2px;
@@ -117,10 +114,8 @@
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
 
-    <!-- KHỐI CONTROLS -->
+    <!-- Khối controls -->
     <div class="controls">
-
-      <!-- Dropdown lọc loại -->
       <div class="filter-row">
         <label for="categoryFilter">Loại sản phẩm:</label>
         <select id="categoryFilter" class="form-select">
@@ -128,7 +123,6 @@
         </select>
       </div>
 
-      <!-- Search -->
       <div class="search-row">
         <label for="globalSearch">Search:</label>
         <input type="text" id="globalSearch" placeholder="">
@@ -140,7 +134,7 @@
     <table id="banggia" class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
-          <th>LOẠI</th>
+          <th>LOẠI</th>         <!-- BỊ ẨN BẰNG CSS, PHẢI GIỮ -->
           <th>SẢN PHẨM</th>
           <th>GIÁ BÁN</th>
           <th>VAT</th>
@@ -164,25 +158,27 @@
 
     function buildCategoryFilter() {
       const select = document.getElementById("categoryFilter");
-
-      // Xóa option cũ (giữ Tất cả)
       while (select.options.length > 1) select.remove(1);
 
-      const column = table.column(0); // cột LOẠI
+      const column = table.column(0); // cột LOẠI (đang ẩn)
       column.data().unique().sort().each(function (d) {
-        if (!d) return;
-        let opt = document.createElement("option");
-        opt.value = d;
-        opt.textContent = d;
+        const value = (d || "").toString().trim();
+        if (!value) return;
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = value;
         select.appendChild(opt);
       });
 
       select.addEventListener("change", function () {
-        let val = this.value;
-        if (val)
-          table.column(0).search("^" + val + "$", true, false).draw();
-        else
+        const val = this.value;
+        if (val) {
+          table.column(0)
+               .search("^" + $.fn.dataTable.util.escapeRegex(val) + "$", true, false)
+               .draw();
+        } else {
           table.column(0).search("", true, false).draw();
+        }
       });
     }
 
@@ -202,44 +198,48 @@
             first: "Đầu",
             last: "Cuối",
             next: "Sau",
-            previous: "Trước",
-          },
+            previous: "Trước"
+          }
         },
         columnDefs: [
-          { targets: 0, visible: false, searchable: true }, // Ẩn cột LOẠI
-        ],
+          { targets: 0, visible: false, searchable: true } // ẩn cột LOẠI
+        ]
       });
 
-      // Search custom
-      document.getElementById("globalSearch").addEventListener("keyup", function () {
-        table.search(this.value).draw();
-      });
+      document.getElementById("globalSearch")
+        .addEventListener("keyup", function () {
+          table.search(this.value).draw();
+        });
 
       buildCategoryFilter();
     }
 
     async function loadExcel() {
       try {
-        let res = await fetch("banggia.xlsx");
-        let buf = await res.arrayBuffer();
-        let wb = XLSX.read(buf, { type: "array" });
+        const res = await fetch("banggia.xlsx");
+        if (!res.ok) throw new Error("Không tìm thấy banggia.xlsx");
 
-        let sheet = wb.Sheets[wb.SheetNames[0]];
-        let rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const buf = await res.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
         const tbody = document.querySelector("#banggia tbody");
         tbody.innerHTML = "";
 
+        // Bỏ dòng tiêu đề
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length === 0) continue;
+          if (!row || row.every(v => v === "" || v === null || v === undefined)) continue;
 
           const tr = document.createElement("tr");
+          // A–E = 0–4
           for (let c = 0; c < 5; c++) {
             const td = document.createElement("td");
             const val = row[c] || "";
 
-            if (c === 2) td.classList.add("gia");        // GIÁ BÁN
+            if (c === 2) td.classList.add("gia");
             if (c === 3 || c === 4) td.classList.add("center");
 
             td.textContent = val;
@@ -250,7 +250,7 @@
 
         initDataTable();
       } catch (err) {
-        alert("Lỗi đọc file Excel: " + err);
+        alert("Lỗi đọc Excel: " + err.message);
       }
     }
 
