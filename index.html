@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Bảng giá từ Excel - Tự động</title>
+  <title>Bảng giá linh kiện giá sỉ</title>
 
   <!-- Bootstrap -->
   <link rel="stylesheet"
@@ -29,27 +29,22 @@
       background: #f8f8f8;
       font-weight: 600;
     }
-    .loading {
-      text-align: center;
-      margin: 20px 0;
-      font-style: italic;
-      color: #555;
+
+    /* Căn phải giá tiền */
+    td.gia {
+      text-align: right;
+      padding-right: 15px;
     }
-    .error {
+
+    /* Căn giữa VAT & Bảo hành */
+    td.center {
       text-align: center;
-      margin: 20px 0;
-      color: #c0392b;
-      font-weight: 600;
     }
   </style>
 </head>
 <body>
   <div class="container mt-3">
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
-
-    <div id="status" class="loading">
-      Đang tải dữ liệu từ file <strong>banggia.xlsx</strong>...
-    </div>
 
     <!-- Bảng giá -->
     <table id="banggia" class="table table-striped table-hover table-bordered">
@@ -62,7 +57,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Sẽ được fill từ Excel -->
+        <!-- Sẽ được fill từ banggia.xlsx -->
       </tbody>
     </table>
   </div>
@@ -82,7 +77,7 @@
         $('#banggia').DataTable().destroy();
       }
       $('#banggia').DataTable({
-        pageLength: 10,
+        pageLength: 100,
         language: {
           search: "Tìm kiếm:",
           lengthMenu: "Hiển thị _MENU_ dòng",
@@ -100,11 +95,9 @@
     }
 
     async function loadExcel() {
-      const statusEl = document.getElementById('status');
       try {
         // Đọc file banggia.xlsx từ cùng thư mục với index.html
         const response = await fetch('banggia.xlsx');
-
         if (!response.ok) {
           throw new Error('Không tìm thấy file banggia.xlsx (HTTP ' + response.status + ')');
         }
@@ -125,7 +118,9 @@
           const row = rows[i];
           if (!row || row.length === 0) continue;
 
-          const isEmpty = row.every(cell => cell === undefined || cell === null || cell === "");
+          const isEmpty = row.every(cell =>
+            cell === undefined || cell === null || cell === ""
+          );
           if (isEmpty) continue;
 
           const tr = document.createElement('tr');
@@ -133,25 +128,26 @@
           // Cột A-D -> index 0-3
           for (let c = 0; c < 4; c++) {
             const td = document.createElement('td');
-            td.textContent = row[c] !== undefined ? row[c] : "";
+            const value = row[c] !== undefined ? row[c] : "";
+
+            // Gán style theo cột
+            if (c === 1) td.classList.add('gia');          // GIÁ BÁN
+            if (c === 2 || c === 3) td.classList.add('center'); // VAT + BẢO HÀNH
+
+            td.textContent = value;
             tr.appendChild(td);
           }
+
           tbody.appendChild(tr);
         }
 
-        statusEl.textContent = "Đã tải dữ liệu từ banggia.xlsx.";
-        statusEl.classList.remove('loading');
         initDataTable();
-
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Lỗi khi đọc file banggia.xlsx: " + err.message;
-        statusEl.classList.remove('loading');
-        statusEl.classList.add('error');
+        alert("Lỗi khi đọc file banggia.xlsx: " + err.message);
       }
     }
 
-    // Gọi khi trang load xong
     document.addEventListener('DOMContentLoaded', loadExcel);
   </script>
 </body>
