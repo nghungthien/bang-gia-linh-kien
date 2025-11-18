@@ -32,7 +32,7 @@
       font-weight: 600;
     }
 
-    /* Căn giữa toàn bộ tiêu đề (trừ cột bị ẩn) */
+    /* Căn giữa toàn bộ tiêu đề */
     table.dataTable thead th {
       text-align: center !important;
       vertical-align: middle !important;
@@ -49,51 +49,53 @@
       text-align: center;
     }
 
-    /* Ẩn cột LOẠI trong bảng (chỉ dùng để lọc) */
+    /* Ẩn cột LOẠI (header + data) khỏi bảng, vẫn dùng để lọc */
     #banggia th:nth-child(1),
     #banggia td:nth-child(1) {
       display: none;
     }
 
-    /* Ô lọc loại sản phẩm */
-    .filter-wrapper {
+    /* Khối điều khiển (lọc loại + search) – rộng bằng bảng */
+    .controls {
+      max-width: 100%;
+      margin: 0 auto 12px;
+    }
+
+    .filter-row {
       display: flex;
-      justify-content: center;
-      margin-bottom: 8px;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 6px;
     }
-    .filter-wrapper label {
+
+    .filter-row label {
+      font-weight: 700;
       margin-right: 8px;
-      font-weight: 600;
     }
-    .filter-wrapper select {
-      width: auto;
-      min-width: 180px;
+
+    .filter-row select {
+      width: 260px;
+      max-width: 100%;
+      height: 38px;
     }
 
     /* Ô search custom */
-    .search-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    .search-box {
+    .search-row {
       border: 2px solid #e74c3c;
       border-radius: 2px;
       padding: 4px 10px;
       display: flex;
       align-items: center;
-      width: 100%;
-      max-width: 900px;
+      width: 100%;          /* full ngang bằng bảng */
+      box-sizing: border-box;
     }
 
-    .search-box label {
+    .search-row label {
       margin: 0 8px 0 0;
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    .search-box input {
+    .search-row input {
       border: none;
       box-shadow: none !important;
       outline: none !important;
@@ -113,17 +115,18 @@
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
 
-    <!-- Lọc theo loại sản phẩm -->
-    <div class="filter-wrapper">
-      <label for="categoryFilter">Loại sản phẩm:</label>
-      <select id="categoryFilter" class="form-select">
-        <option value="">Tất cả</option>
-      </select>
-    </div>
+    <!-- Khối điều khiển: lọc loại + search -->
+    <div class="controls">
+      <!-- Lọc theo loại sản phẩm -->
+      <div class="filter-row">
+        <label for="categoryFilter">Loại sản phẩm:</label>
+        <select id="categoryFilter" class="form-select">
+          <option value="">Tất cả</option>
+        </select>
+      </div>
 
-    <!-- Ô search custom -->
-    <div class="search-wrapper">
-      <div class="search-box">
+      <!-- Ô search custom -->
+      <div class="search-row">
         <label for="globalSearch">Search:</label>
         <input type="text" id="globalSearch" placeholder="" />
         <span class="search-icon">🔍</span>
@@ -134,7 +137,7 @@
     <table id="banggia" class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
-          <th>LOẠI</th>        <!-- Ẩn bằng CSS, vẫn dùng để lọc -->
+          <th>LOẠI</th> <!-- bị ẩn bằng CSS, dùng để lọc -->
           <th>SẢN PHẨM</th>
           <th>GIÁ BÁN</th>
           <th>VAT</th>
@@ -168,7 +171,7 @@
         select.remove(1);
       }
 
-      // Cột 0 = LOẠI (đang bị ẩn)
+      // Cột 0 = LOẠI (dù đang ẩn)
       const column = table.column(0);
       column.data().unique().sort().each(function (d) {
         const value = (d || '').toString().trim();
@@ -211,7 +214,10 @@
             next: "Sau",
             previous: "Trước"
           }
-        }
+        },
+        columnDefs: [
+          { targets: 0, visible: false, searchable: true } // ẩn cột LOẠI trong DataTables
+        ]
       });
 
       // Ô search custom
