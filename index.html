@@ -115,19 +115,13 @@
       font-size: 14px;
     }
 
-    /* ===== HEADER – ĐỎ ĐẬM & CĂN GIỮA TUYỆT ĐỐI ===== */
-    #banggia thead th,
-    #banggia thead th.sorting,
-    #banggia thead th.sorting_asc,
-    #banggia thead th.sorting_desc {
-      display: table-cell !important;
-      text-align: center !important;
-      vertical-align: middle !important;
-      justify-content: center !important;
-      align-items: center !important;
-      color: #e74c3c !important;
-      font-weight: 800 !important;
-      background-color: #fff !important;
+    /* Header: base style (JS sẽ ép lại lần nữa sau) */
+    #banggia thead th {
+      text-align: center;
+      vertical-align: middle;
+      font-weight: 800;
+      color: #e74c3c;
+      background-color: #fff;
     }
 
     /* SẢN PHẨM – căn trái */
@@ -274,6 +268,14 @@
         language: {
           emptyTable: "Không có dữ liệu"
         }
+      });
+
+      // 🔴 ÉP LẠI HEADER SAU KHI DATATABLES KHỞI TẠO
+      $('#banggia thead th').css({
+        'text-align': 'center',
+        'vertical-align': 'middle',
+        'color': '#e74c3c',
+        'font-weight': '800'
       });
 
       // Search custom
