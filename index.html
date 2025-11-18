@@ -32,12 +32,12 @@
       font-weight: 600;
     }
 
-    /* Tiêu đề cột đỏ đậm, căn giữa */
+    /* Tiêu đề cột: đỏ đậm, căn giữa */
     #banggia thead th {
       text-align: center !important;
       vertical-align: middle !important;
-      color: #e74c3c;
-      font-weight: 700;
+      color: #e74c3c !important;
+      font-weight: 700 !important;
     }
 
     /* Căn phải giá tiền */
@@ -103,6 +103,15 @@
       font-size: 20px;
       color: #333;
     }
+
+    /* Dòng tổng số sản phẩm */
+    #totalRow {
+      width: 900px;
+      max-width: 100%;
+      margin: 8px auto 0;
+      font-weight: 700;
+      text-align: right;
+    }
   </style>
 </head>
 
@@ -139,6 +148,9 @@
       </thead>
       <tbody></tbody>
     </table>
+
+    <!-- Dòng tổng số sản phẩm -->
+    <div id="totalRow">Tổng số sản phẩm: 0</div>
   </div>
 
   <!-- JS -->
@@ -160,6 +172,12 @@
       const cat = rowNode.getAttribute("data-category") || "";
       return cat === currentCategory;
     });
+
+    function updateTotalRow() {
+      const count = table.rows({ filter: "applied" }).count();
+      document.getElementById("totalRow").textContent =
+        "Tổng số sản phẩm: " + count.toLocaleString("vi-VN");
+    }
 
     function buildCategoryFilter() {
       const select = document.getElementById("categoryFilter");
@@ -191,10 +209,9 @@
       }
 
       table = $("#banggia").DataTable({
-        dom: 'rt',            // chỉ table + header, không phân trang, không info
-        pageLength: -1,       // không dùng paging
-        paging: false,        // tắt phân trang
-        scrollY: '60vh',      // chiều cao, có thanh trượt dọc
+        dom: "rt",          // chỉ table + header
+        paging: false,      // tắt phân trang
+        scrollY: "60vh",    // chiều cao, có thanh trượt dọc
         scrollCollapse: true,
         language: {
           emptyTable: "Không có dữ liệu"
@@ -206,7 +223,11 @@
           table.search(this.value).draw();
         });
 
+      // cập nhật tổng số sau mỗi lần vẽ lại (filter, search...)
+      table.on("draw", updateTotalRow);
+
       buildCategoryFilter();
+      updateTotalRow();
     }
 
     async function loadExcel() {
