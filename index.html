@@ -40,4 +40,222 @@
 
     /* Căn phải giá tiền */
     td.gia {
-      text-align: r
+      text-align: right;
+      padding-right: 15px;
+    }
+
+    /* Căn giữa VAT & Bảo hành */
+    td.center {
+      text-align: center;
+    }
+
+    /* Ẩn cột LOẠI (header + data) */
+    #banggia th:nth-child(1),
+    #banggia td:nth-child(1) {
+      display: none;
+    }
+
+    /* KHỐI CONTROL (lọc + search) */
+    .controls {
+      width: 900px;
+      max-width: 100%;
+      margin: 0 auto 15px; /* Căn giữa dưới tiêu đề */
+    }
+
+    /* Hàng lọc loại */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;  /* Căn giữa toàn bộ */
+      margin-bottom: 10px;
+    }
+
+    .filter-row label {
+      font-weight: 700;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+
+    .filter-row select {
+      width: 260px;
+      height: 38px;
+    }
+
+    /* Ô search custom */
+    .search-row {
+      border: 2px solid #e74c3c;
+      border-radius: 2px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .search-row label {
+      margin-right: 10px;
+      font-weight: 700;
+    }
+
+    .search-row input {
+      border: none;
+      outline: none !important;
+      flex: 1;
+      font-size: 15px;
+    }
+
+    .search-icon {
+      margin-left: 8px;
+      font-size: 20px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-3">
+
+    <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
+
+    <!-- KHỐI CONTROLS -->
+    <div class="controls">
+
+      <!-- Dropdown lọc loại -->
+      <div class="filter-row">
+        <label for="categoryFilter">Loại sản phẩm:</label>
+        <select id="categoryFilter" class="form-select">
+          <option value="">Tất cả</option>
+        </select>
+      </div>
+
+      <!-- Search -->
+      <div class="search-row">
+        <label for="globalSearch">Search:</label>
+        <input type="text" id="globalSearch" placeholder="">
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <!-- Bảng giá -->
+    <table id="banggia" class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>LOẠI</th>
+          <th>SẢN PHẨM</th>
+          <th>GIÁ BÁN</th>
+          <th>VAT</th>
+          <th>BẢO HÀNH</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- JS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    let table = null;
+
+    function buildCategoryFilter() {
+      const select = document.getElementById("categoryFilter");
+
+      // Xóa option cũ (giữ Tất cả)
+      while (select.options.length > 1) select.remove(1);
+
+      const column = table.column(0); // cột LOẠI
+      column.data().unique().sort().each(function (d) {
+        if (!d) return;
+        let opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener("change", function () {
+        let val = this.value;
+        if (val)
+          table.column(0).search("^" + val + "$", true, false).draw();
+        else
+          table.column(0).search("", true, false).draw();
+      });
+    }
+
+    function initDataTable() {
+      if ($.fn.DataTable.isDataTable("#banggia")) {
+        $("#banggia").DataTable().destroy();
+      }
+
+      table = $("#banggia").DataTable({
+        dom: 'rt<"bottom"lip><"clear">',
+        pageLength: 100,
+        language: {
+          lengthMenu: "Hiển thị _MENU_ dòng",
+          info: "Hiển thị _START_ đến _END_ trên tổng _TOTAL_ dòng",
+          emptyTable: "Không có dữ liệu",
+          paginate: {
+            first: "Đầu",
+            last: "Cuối",
+            next: "Sau",
+            previous: "Trước",
+          },
+        },
+        columnDefs: [
+          { targets: 0, visible: false, searchable: true }, // Ẩn cột LOẠI
+        ],
+      });
+
+      // Search custom
+      document.getElementById("globalSearch").addEventListener("keyup", function () {
+        table.search(this.value).draw();
+      });
+
+      buildCategoryFilter();
+    }
+
+    async function loadExcel() {
+      try {
+        let res = await fetch("banggia.xlsx");
+        let buf = await res.arrayBuffer();
+        let wb = XLSX.read(buf, { type: "array" });
+
+        let sheet = wb.Sheets[wb.SheetNames[0]];
+        let rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const tbody = document.querySelector("#banggia tbody");
+        tbody.innerHTML = "";
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length === 0) continue;
+
+          const tr = document.createElement("tr");
+          for (let c = 0; c < 5; c++) {
+            const td = document.createElement("td");
+            const val = row[c] || "";
+
+            if (c === 2) td.classList.add("gia");        // GIÁ BÁN
+            if (c === 3 || c === 4) td.classList.add("center");
+
+            td.textContent = val;
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+
+        initDataTable();
+      } catch (err) {
+        alert("Lỗi đọc file Excel: " + err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadExcel);
+  </script>
+
+</body>
+</html>
