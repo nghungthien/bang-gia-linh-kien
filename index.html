@@ -33,7 +33,7 @@
     }
 
     /* Tiêu đề cột: đỏ đậm, căn giữa */
-    #banggia thead th {
+    table#banggia.dataTable thead > tr > th {
       text-align: center !important;
       vertical-align: middle !important;
       color: #e74c3c !important;
@@ -104,13 +104,13 @@
       color: #333;
     }
 
-    /* Dòng tổng số sản phẩm */
+    /* Dòng tổng số sản phẩm – căn trái */
     #totalRow {
       width: 900px;
       max-width: 100%;
       margin: 8px auto 0;
       font-weight: 700;
-      text-align: right;
+      text-align: left;
     }
   </style>
 </head>
@@ -136,7 +136,7 @@
       </div>
     </div>
 
-    <!-- Bảng giá: 4 cột hiển thị -->
+    <!-- Bảng giá -->
     <table id="banggia" class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
@@ -209,9 +209,9 @@
       }
 
       table = $("#banggia").DataTable({
-        dom: "rt",          // chỉ table + header
-        paging: false,      // tắt phân trang
-        scrollY: "60vh",    // chiều cao, có thanh trượt dọc
+        dom: "rt",
+        paging: false,
+        scrollY: "60vh",
         scrollCollapse: true,
         language: {
           emptyTable: "Không có dữ liệu"
@@ -223,7 +223,6 @@
           table.search(this.value).draw();
         });
 
-      // cập nhật tổng số sau mỗi lần vẽ lại (filter, search...)
       table.on("draw", updateTotalRow);
 
       buildCategoryFilter();
