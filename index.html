@@ -13,112 +13,157 @@
         href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 
   <style>
+    /* ====== BASE ====== */
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background-color: #f5f5f7;
+      color: #2e2e2e;
+    }
+
+    .page-wrapper {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      padding: 0 16px;
     }
 
     h1.page-title {
-      margin: 20px 0 10px;
+      margin: 20px auto 4px !important;
       font-size: 28px;
-      font-weight: 700;
+      font-weight: 800;
       color: #e74c3c;
       text-align: center;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .table thead {
-      background: #f8f8f8;
-      font-weight: 600;
-    }
-
-    /* Tiêu đề cột: đỏ đậm, căn giữa */
-    table#banggia.dataTable thead > tr > th {
-      text-align: center !important;
-      vertical-align: middle !important;
-      color: #e74c3c !important;
-      font-weight: 700 !important;
-    }
-
-    /* Căn phải giá tiền */
-    td.gia {
-      text-align: right;
-      padding-right: 15px;
-    }
-
-    /* Căn giữa VAT & Bảo hành */
-    td.center {
+    .page-subtitle {
       text-align: center;
+      font-size: 13px;
+      color: #7a7a7a;
+      margin-bottom: 16px;
     }
 
-    /* KHỐI CONTROL (lọc + search) */
+    /* ====== CONTROLS ====== */
     .controls {
-      width: 900px;
-      max-width: 100%;
-      margin: 0 auto 15px;
+      max-width: 900px;
+      margin: 0 auto 16px;
     }
 
     .filter-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
     .filter-row label {
       font-weight: 700;
-      margin-right: 10px;
-      font-size: 16px;
+      font-size: 14px;
+      white-space: nowrap;
     }
 
     .filter-row select {
       width: 260px;
       height: 38px;
+      font-size: 14px;
     }
 
     .search-row {
       border: 2px solid #e74c3c;
-      border-radius: 2px;
+      border-radius: 4px;
       padding: 4px 10px;
       display: flex;
       align-items: center;
       width: 100%;
       box-sizing: border-box;
+      background-color: #fff;
     }
 
     .search-row label {
       margin-right: 10px;
       font-weight: 700;
+      font-size: 14px;
     }
 
     .search-row input {
       border: none;
       outline: none !important;
       flex: 1;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .search-icon {
       margin-left: 8px;
       font-size: 20px;
-      color: #333;
+      color: #555;
     }
 
-    /* Dòng tổng số sản phẩm – căn trái */
+    /* ====== TABLE CARD ====== */
+    .table-card {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+      padding: 8px 10px 12px;
+      border: 1px solid #e3e3e3;
+    }
+
+    table#banggia {
+      margin-bottom: 0 !important;
+      font-size: 14px;
+    }
+
+    /* Header cột: đỏ đậm, căn giữa */
+    table#banggia.dataTable thead > tr > th {
+      text-align: center !important;
+      vertical-align: middle !important;
+      color: #e74c3c !important;
+      font-weight: 800 !important;
+      border-bottom-width: 2px;
+    }
+
+    /* Căn phải giá tiền */
+    td.gia {
+      text-align: right;
+      padding-right: 15px;
+      white-space: nowrap;
+    }
+
+    /* Căn giữa VAT & Bảo hành */
+    td.center {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* Zebra + hover */
+    table#banggia tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    table#banggia tbody tr:hover {
+      background-color: #f0f4ff;
+    }
+
+    /* Dòng tổng số sản phẩm – căn trái, nằm trong card */
     #totalRow {
-      width: 900px;
-      max-width: 100%;
-      margin: 8px auto 0;
+      margin-top: 8px;
       font-weight: 700;
+      font-size: 14px;
       text-align: left;
+      color: #444;
     }
   </style>
 </head>
 
 <body>
-  <div class="container mt-3">
+  <div class="page-wrapper">
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
+    <div class="page-subtitle">
+      Dữ liệu lấy tự động từ file <strong>banggia.xlsx</strong> – lọc theo loại &amp; tìm kiếm nhanh.
+    </div>
 
     <!-- Khối controls -->
     <div class="controls">
@@ -131,26 +176,27 @@
 
       <div class="search-row">
         <label for="globalSearch">Search:</label>
-        <input type="text" id="globalSearch" placeholder="">
+        <input type="text" id="globalSearch" placeholder="Nhập tên sản phẩm, bảo hành, VAT...">
         <span class="search-icon">🔍</span>
       </div>
     </div>
 
-    <!-- Bảng giá -->
-    <table id="banggia" class="table table-striped table-hover table-bordered">
-      <thead>
-        <tr>
-          <th>SẢN PHẨM</th>
-          <th>GIÁ BÁN</th>
-          <th>VAT</th>
-          <th>BẢO HÀNH</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <!-- Bảng + tổng trong 1 card -->
+    <div class="table-card">
+      <table id="banggia" class="table table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th>SẢN PHẨM</th>
+            <th>GIÁ BÁN</th>
+            <th>VAT</th>
+            <th>BẢO HÀNH</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-    <!-- Dòng tổng số sản phẩm -->
-    <div id="totalRow">Tổng số sản phẩm: 0</div>
+      <div id="totalRow">Tổng số sản phẩm: 0</div>
+    </div>
   </div>
 
   <!-- JS -->
@@ -209,20 +255,22 @@
       }
 
       table = $("#banggia").DataTable({
-        dom: "rt",
-        paging: false,
-        scrollY: "60vh",
+        dom: "rt",           // chỉ header + body
+        paging: false,       // tắt phân trang
+        scrollY: "60vh",     // thanh trượt dọc
         scrollCollapse: true,
         language: {
           emptyTable: "Không có dữ liệu"
         }
       });
 
+      // Search custom
       document.getElementById("globalSearch")
         .addEventListener("keyup", function () {
           table.search(this.value).draw();
         });
 
+      // Cập nhật tổng khi vẽ lại
       table.on("draw", updateTotalRow);
 
       buildCategoryFilter();
