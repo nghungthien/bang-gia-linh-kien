@@ -115,18 +115,20 @@
       font-size: 14px;
     }
 
-    /* Header cột: đỏ đậm, căn giữa */
-    /* Tiêu đề cột: đỏ đậm & căn giữa */
-#banggia thead th,
-#banggia thead th.sorting,
-#banggia thead th.sorting_asc,
-#banggia thead th.sorting_desc {
-    text-align: center !important;
-    vertical-align: middle !important;
-    color: #e74c3c !important;
-    font-weight: 800 !important;
-}
-
+    /* ===== HEADER – ĐỎ ĐẬM & CĂN GIỮA TUYỆT ĐỐI ===== */
+    #banggia thead th,
+    #banggia thead th.sorting,
+    #banggia thead th.sorting_asc,
+    #banggia thead th.sorting_desc {
+      display: table-cell !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      justify-content: center !important;
+      align-items: center !important;
+      color: #e74c3c !important;
+      font-weight: 800 !important;
+      background-color: #fff !important;
+    }
 
     /* SẢN PHẨM – căn trái */
     td.sanpham {
@@ -357,4 +359,3 @@
 
 </body>
 </html>
-
