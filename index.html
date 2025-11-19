@@ -127,6 +127,7 @@
       font-weight: 800 !important;
       font-size: 14px;
       background: #fff !important;
+      white-space: nowrap !important;  /* <— không cho xuống dòng */
     }
 
     /* Icon màu đỏ */
@@ -302,7 +303,6 @@
       try {
         const sheetID = "1nY2O5p4DBaJtyRh1Ff0OSs6WL2r-0514GSJXbFXWieI";
         const sheetName = "giacapnhat";
-
         const url =
           `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
