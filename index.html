@@ -115,13 +115,13 @@
       font-size: 14px;
     }
 
-    /* ====== HEADER COLUMNS ====== */
-    #banggia thead th {
+    /* ====== HEADER COLUMNS (áp dụng cho cả header clone của DataTables) ====== */
+    table.dataTable thead > tr > th {
       text-align: center !important;
       vertical-align: middle !important;
       color: #e74c3c !important;
       font-weight: 800 !important;
-      background: #fff !important;
+      background-color: #ffffff !important;
       font-size: 14px;
     }
 
@@ -288,14 +288,17 @@
       updateTotalRow();
     }
 
+    // ====== LOAD GOOGLE SHEET (gviz JSON) ======
     async function loadGoogleSheet() {
       try {
         const sheetID = "1nY2O5p4DBaJtyRh1Ff0OSs6WL2r-0514GSJXbFXWieI";
-        const sheetName = "Sheet1";
-        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+        const sheetName = "giacapnhat";   // tên sheet trong file của bạn
+        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
 
         const res = await fetch(url);
         const text = await res.text();
+
+        // Google trả về "/*O_o*/\ngoogle.visualization.Query.setResponse({...});"
         const json = JSON.parse(text.substring(47, text.length - 2));
 
         const tbody = document.querySelector("#banggia tbody");
@@ -306,10 +309,12 @@
           if (!cells) return;
 
           const category = cells[0]?.v || "";
-          const name = cells[1]?.v || "";
-          const price = cells[2]?.v || "";
-          const vat = cells[3]?.v || "";
+          const name     = cells[1]?.v || "";
+          const price    = cells[2]?.v || "";
+          const vat      = cells[3]?.v || "";
           const warranty = cells[4]?.v || "";
+
+          if (!name) return;
 
           const tr = document.createElement("tr");
           tr.setAttribute("data-category", category);
