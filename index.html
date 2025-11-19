@@ -44,7 +44,30 @@
       text-align: center;
       font-size: 13px;
       color: #7a7a7a;
-      margin-bottom: 16px;
+      margin-bottom: 4px;
+    }
+
+    /* ====== CONTACT NOTES ====== */
+    #contactNoteTop,
+    #contactNoteBottom {
+      margin-top: 4px;
+      font-size: 14px;
+      color: #2e2e2e;
+    }
+
+    #contactNoteTop {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    #contactNoteBottom {
+      text-align: left;
+    }
+
+    #contactNoteTop strong,
+    #contactNoteBottom strong {
+      color: #e74c3c;
+      font-weight: 800;
     }
 
     /* ====== CONTROLS ====== */
@@ -119,7 +142,7 @@
       font-size: 14px;
     }
 
-    /* ====== HEADER COLUMNS – Style 1: xanh biển nhạt + đỏ ====== */
+    /* ====== HEADER COLUMNS – Style 1 ====== */
     table.dataTable thead > tr > th {
       text-align: center !important;
       vertical-align: middle !important;
@@ -200,9 +223,17 @@
   <div class="page-wrapper">
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
+
     <!-- Subtitle sẽ được JS cập nhật thời gian -->
     <div class="page-subtitle" id="subtitle">
       Đang tải dữ liệu từ Google Sheet…
+    </div>
+
+    <!-- Dòng liên hệ phía trên (dưới subtitle) -->
+    <div id="contactNoteTop">
+      Quý khách vui lòng liên hệ Số điện thoại/Zalo:
+      <strong>0948.276.231</strong>
+      để mua hàng.
     </div>
 
     <!-- Khối controls -->
@@ -236,6 +267,13 @@
       </table>
 
       <div id="totalRow">Tổng số sản phẩm: 0</div>
+
+      <!-- Dòng liên hệ phía dưới bảng -->
+      <div id="contactNoteBottom">
+        Quý khách vui lòng liên hệ Số điện thoại/Zalo:
+        <strong>0948.276.231</strong>
+        để mua hàng.
+      </div>
     </div>
   </div>
 
