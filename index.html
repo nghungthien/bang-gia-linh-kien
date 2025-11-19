@@ -115,18 +115,29 @@
       font-size: 14px;
     }
 
-    /* HEADER – đỏ đậm & căn giữa, áp dụng luôn cho header clone của DataTables */
-    table.dataTable thead > tr > th {
+    /* ====== HEADER COLUMNS ====== */
+    #banggia thead th {
       text-align: center !important;
       vertical-align: middle !important;
       color: #e74c3c !important;
       font-weight: 800 !important;
-      background-color: #ffffff !important;
+      background: #fff !important;
+      font-size: 14px;
     }
 
-    /* SẢN PHẨM – căn trái */
+    /* ====== COLUMN STYLES ====== */
+
+    /* SẢN PHẨM – xanh Facebook + in đậm */
     td.sanpham {
+      color: #1877F2 !important;
+      font-weight: 700 !important;
+      text-decoration: none;
       text-align: left !important;
+    }
+
+    /* Hover màu xanh đậm hơn */
+    table#banggia tbody tr:hover td.sanpham {
+      color: #0d5fcc !important;
     }
 
     /* GIÁ BÁN – căn phải */
@@ -152,7 +163,7 @@
       background-color: #f0f4ff;
     }
 
-    /* Dòng tổng số sản phẩm – căn trái trong card */
+    /* Tổng sản phẩm */
     #totalRow {
       margin-top: 8px;
       font-weight: 700;
@@ -168,7 +179,7 @@
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
     <div class="page-subtitle">
-      Dữ liệu lấy trực tiếp từ <strong>Google Sheet</strong> – lọc theo loại &amp; tìm kiếm nhanh.
+      Dữ liệu lấy trực tiếp từ Google Sheet – lọc theo loại & tìm kiếm nhanh.
     </div>
 
     <!-- Khối controls -->
@@ -187,7 +198,7 @@
       </div>
     </div>
 
-    <!-- Bảng + tổng trong 1 card -->
+    <!-- Bảng + tổng -->
     <div class="table-card">
       <table id="banggia" class="table table-striped table-hover table-bordered">
         <thead>
@@ -215,7 +226,7 @@
     let table = null;
     let currentCategory = "";
 
-    // Filter theo loại trong data-category (cột LOẠI)
+    // Filter theo loại
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
       if (!currentCategory) return true;
       const rowNode = table.row(dataIndex).node();
@@ -259,82 +270,56 @@
       }
 
       table = $("#banggia").DataTable({
-        dom: "rt",           // chỉ header + body
-        paging: false,       // tắt phân trang
-        scrollY: "60vh",     // thanh trượt dọc
+        dom: "rt",
+        paging: false,
+        scrollY: "60vh",
         scrollCollapse: true,
-        language: {
-          emptyTable: "Không có dữ liệu"
-        }
+        language: { emptyTable: "Không có dữ liệu" }
       });
 
-      // Search custom
       document.getElementById("globalSearch")
         .addEventListener("keyup", function () {
           table.search(this.value).draw();
         });
 
-      // Cập nhật tổng khi vẽ lại
       table.on("draw", updateTotalRow);
 
       buildCategoryFilter();
       updateTotalRow();
     }
 
-    // ====== LOAD GOOGLE SHEET ======
     async function loadGoogleSheet() {
       try {
-        // ID và tên sheet của bạn
         const sheetID = "1nY2O5p4DBaJtyRh1Ff0OSs6WL2r-0514GSJXbFXWieI";
-        const sheetName = "giacapnhat"; // đúng với tab bạn chụp
-
-        // API JSON trung gian: https://opensheet.elk.sh
-        const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+        const sheetName = "Sheet1";
+        const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Không đọc được Google Sheet");
-
-        const data = await res.json();
+        const text = await res.text();
+        const json = JSON.parse(text.substring(47, text.length - 2));
 
         const tbody = document.querySelector("#banggia tbody");
         tbody.innerHTML = "";
 
-        // Google Sheet: LOẠI | SẢN PHẨM | GIÁ BÁN | VAT | BẢO HÀNH
-        data.forEach(row => {
-          const category = row.LOAI || "";
-          const name     = row["SẢN PHẨM"] || "";
-          const price    = row["GIÁ BÁN"] || "";
-          const vat      = row.VAT || "";
-          const warranty = row["BẢO HÀNH"] || "";
+        json.table.rows.forEach(row => {
+          const cells = row.c;
+          if (!cells) return;
 
-          if (!name) return; // bỏ dòng trống
+          const category = cells[0]?.v || "";
+          const name = cells[1]?.v || "";
+          const price = cells[2]?.v || "";
+          const vat = cells[3]?.v || "";
+          const warranty = cells[4]?.v || "";
 
           const tr = document.createElement("tr");
           tr.setAttribute("data-category", category);
 
-          // SẢN PHẨM
-          let td = document.createElement("td");
-          td.classList.add("sanpham");
-          td.textContent = name;
-          tr.appendChild(td);
-
-          // GIÁ BÁN
-          td = document.createElement("td");
-          td.classList.add("gia");
-          td.textContent = price;
-          tr.appendChild(td);
-
-          // VAT
-          td = document.createElement("td");
-          td.classList.add("center");
-          td.textContent = vat;
-          tr.appendChild(td);
-
-          // BẢO HÀNH
-          td = document.createElement("td");
-          td.classList.add("center");
-          td.textContent = warranty;
-          tr.appendChild(td);
+          tr.innerHTML = `
+            <td class="sanpham">${name}</td>
+            <td class="gia">${price}</td>
+            <td class="center">${vat}</td>
+            <td class="center">${warranty}</td>
+          `;
 
           tbody.appendChild(tr);
         });
