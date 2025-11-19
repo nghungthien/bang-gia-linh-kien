@@ -115,7 +115,7 @@
       font-size: 14px;
     }
 
-    /* ===== HEADER – đỏ đậm & căn giữa, áp dụng cả header clone của DataTables ===== */
+    /* HEADER – đỏ đậm & căn giữa, áp dụng luôn cho header clone của DataTables */
     table.dataTable thead > tr > th {
       text-align: center !important;
       vertical-align: middle !important;
@@ -168,7 +168,7 @@
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
     <div class="page-subtitle">
-      Dữ liệu lấy tự động từ file <strong>banggia.xlsx</strong> – lọc theo loại &amp; tìm kiếm nhanh.
+      Dữ liệu lấy trực tiếp từ <strong>Google Sheet</strong> – lọc theo loại &amp; tìm kiếm nhanh.
     </div>
 
     <!-- Khối controls -->
@@ -211,13 +211,11 @@
   <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
   <script>
     let table = null;
     let currentCategory = "";
 
-    // Filter theo loại trong data-category
+    // Filter theo loại trong data-category (cột LOẠI)
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
       if (!currentCategory) return true;
       const rowNode = table.row(dataIndex).node();
@@ -283,72 +281,71 @@
       updateTotalRow();
     }
 
-    async function loadExcel() {
+    // ====== LOAD GOOGLE SHEET ======
+    async function loadGoogleSheet() {
       try {
-        const res = await fetch("banggia.xlsx");
-        if (!res.ok) throw new Error("Không tìm thấy banggia.xlsx");
+        // ID và tên sheet của bạn
+        const sheetID = "1nY2O5p4DBaJtyRh1Ff0OSs6WL2r-0514GSJXbFXWieI";
+        const sheetName = "giacapnhat"; // đúng với tab bạn chụp
 
-        const buf = await res.arrayBuffer();
-        const wb = XLSX.read(buf, { type: "array" });
+        // API JSON trung gian: https://opensheet.elk.sh
+        const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
 
-        const sheet = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Không đọc được Google Sheet");
+
+        const data = await res.json();
 
         const tbody = document.querySelector("#banggia tbody");
         tbody.innerHTML = "";
 
-        // rows[i][0] = LOẠI
-        // rows[i][1] = SẢN PHẨM
-        // rows[i][2] = GIÁ BÁN
-        // rows[i][3] = VAT
-        // rows[i][4] = BẢO HÀNH
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || row.length === 0) continue;
+        // Google Sheet: LOẠI | SẢN PHẨM | GIÁ BÁN | VAT | BẢO HÀNH
+        data.forEach(row => {
+          const category = row.LOAI || "";
+          const name     = row["SẢN PHẨM"] || "";
+          const price    = row["GIÁ BÁN"] || "";
+          const vat      = row.VAT || "";
+          const warranty = row["BẢO HÀNH"] || "";
 
-          const category = row[0] || "";
-          const name     = row[1] || "";
-          const price    = row[2] || "";
-          const vat      = row[3] || "";
-          const warranty = row[4] || "";
+          if (!name) return; // bỏ dòng trống
 
           const tr = document.createElement("tr");
           tr.setAttribute("data-category", category);
 
-          // SẢN PHẨM – căn trái
+          // SẢN PHẨM
           let td = document.createElement("td");
           td.classList.add("sanpham");
           td.textContent = name;
           tr.appendChild(td);
 
-          // GIÁ BÁN – căn phải
+          // GIÁ BÁN
           td = document.createElement("td");
           td.classList.add("gia");
           td.textContent = price;
           tr.appendChild(td);
 
-          // VAT – căn giữa
+          // VAT
           td = document.createElement("td");
           td.classList.add("center");
           td.textContent = vat;
           tr.appendChild(td);
 
-          // BẢO HÀNH – căn giữa
+          // BẢO HÀNH
           td = document.createElement("td");
           td.classList.add("center");
           td.textContent = warranty;
           tr.appendChild(td);
 
           tbody.appendChild(tr);
-        }
+        });
 
         initDataTable();
       } catch (err) {
-        alert("Lỗi đọc Excel: " + err.message);
+        alert("Lỗi tải Google Sheet: " + err.message);
       }
     }
 
-    document.addEventListener("DOMContentLoaded", loadExcel);
+    document.addEventListener("DOMContentLoaded", loadGoogleSheet);
   </script>
 
 </body>
