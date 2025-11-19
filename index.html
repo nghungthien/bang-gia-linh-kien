@@ -127,7 +127,7 @@
       font-weight: 800 !important;
       font-size: 14px;
       background: #fff !important;
-      white-space: nowrap !important;  /* <— không cho xuống dòng */
+      white-space: nowrap !important;  /* Không xuống dòng */
     }
 
     /* Icon màu đỏ */
@@ -189,8 +189,9 @@
   <div class="page-wrapper">
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
-    <div class="page-subtitle">
-      Dữ liệu lấy trực tiếp từ Google Sheet – lọc theo loại & tìm kiếm nhanh.
+    <!-- Subtitle sẽ được set bằng JS -->
+    <div class="page-subtitle" id="subtitle">
+      Đang tải dữ liệu từ Google Sheet…
     </div>
 
     <!-- Khối controls -->
@@ -298,6 +299,15 @@
       updateTotalRow();
     }
 
+    // Cập nhật dòng subtitle với thời gian hiện tại
+    function updateSubtitleTime() {
+      const subtitle = document.getElementById("subtitle");
+      const now = new Date();
+      const timeStr = now.toLocaleString("vi-VN", { hour12: false });
+      subtitle.textContent =
+        `Dữ liệu được cập nhật lúc ${timeStr} – lọc theo loại & tìm kiếm nhanh.`;
+    }
+
     /* ===== LOAD GOOGLE SHEET ===== */
     async function loadGoogleSheet() {
       try {
@@ -341,8 +351,11 @@
         });
 
         initDataTable();
+        updateSubtitleTime();   // set thời gian sau khi load dữ liệu xong
 
       } catch (err) {
+        document.getElementById("subtitle").textContent =
+          "Lỗi tải dữ liệu từ Google Sheet, vui lòng thử lại sau.";
         alert("Lỗi tải Google Sheet: " + err.message);
       }
     }
