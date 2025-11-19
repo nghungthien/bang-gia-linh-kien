@@ -119,15 +119,23 @@
       font-size: 14px;
     }
 
-    /* ====== HEADER COLUMNS ====== */
+    /* ====== HEADER COLUMNS – Style 1: xanh biển nhạt + đỏ ====== */
     table.dataTable thead > tr > th {
       text-align: center !important;
       vertical-align: middle !important;
       color: #e74c3c !important;
       font-weight: 800 !important;
       font-size: 14px;
-      background: #fff !important;
-      white-space: nowrap !important;  /* Không xuống dòng */
+      background: #e8f1ff !important;          /* nền xanh nhạt */
+      white-space: nowrap !important;
+      border-bottom: 2px solid #d0dbff !important;
+      border-top: 1px solid #d0dbff !important;
+    }
+
+    /* Viền bảng xanh nhạt */
+    #banggia.table-bordered > thead > tr > th,
+    #banggia.table-bordered > tbody > tr > td {
+      border: 1px solid #d0dbff !important;
     }
 
     /* Icon màu đỏ */
@@ -136,6 +144,18 @@
       margin-right: 6px;
       font-size: 17px;
       vertical-align: middle;
+    }
+
+    /* ====== ROW COLORS – Style 1 ====== */
+
+    /* Dòng chẵn */
+    #banggia tbody tr:nth-child(even) {
+      background-color: #f8fbff !important;   /* xanh rất nhạt */
+    }
+
+    /* Hover */
+    #banggia tbody tr:hover {
+      background-color: #f0f7ff !important;   /* xanh hơn chút */
     }
 
     /* ====== COLUMN STYLES ====== */
@@ -147,7 +167,7 @@
       text-align: left !important;
     }
 
-    table#banggia tbody tr:hover td.sanpham {
+    #banggia tbody tr:hover td.sanpham {
       color: #0d5fcc !important;
     }
 
@@ -165,15 +185,6 @@
       white-space: nowrap;
     }
 
-    /* Zebra + hover */
-    table#banggia tbody tr:nth-child(even) {
-      background-color: #fafafa;
-    }
-
-    table#banggia tbody tr:hover {
-      background-color: #f0f4ff;
-    }
-
     /* Tổng sản phẩm */
     #totalRow {
       margin-top: 8px;
@@ -189,7 +200,7 @@
   <div class="page-wrapper">
 
     <h1 class="page-title">BẢNG GIÁ LINH KIỆN GIÁ SỈ</h1>
-    <!-- Subtitle sẽ được set bằng JS -->
+    <!-- Subtitle sẽ được JS cập nhật thời gian -->
     <div class="page-subtitle" id="subtitle">
       Đang tải dữ liệu từ Google Sheet…
     </div>
@@ -319,7 +330,7 @@
         const res = await fetch(url);
         const text = await res.text();
 
-        // Strip wrapper
+        // Google trả về: /*O_o*/\ngoogle.visualization.Query.setResponse({...});
         const json = JSON.parse(text.substring(47, text.length - 2));
 
         const tbody = document.querySelector("#banggia tbody");
@@ -351,7 +362,7 @@
         });
 
         initDataTable();
-        updateSubtitleTime();   // set thời gian sau khi load dữ liệu xong
+        updateSubtitleTime();
 
       } catch (err) {
         document.getElementById("subtitle").textContent =
